@@ -52,10 +52,10 @@ provider:
     #     - kms:Decrypt
     #   Resource: !GetAtt KMSKey.Arn
     - Effect: "Allow"
-        Action:
+      Action:
           - xray:PutTelemetryRecords
           - xray:PutTraceSegments
-        Resource: "*"
+      Resource: "*"
 
 functions:
   Auth:
@@ -276,12 +276,12 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-           - AttributeName: userId
+          - AttributeName: userId
             AttributeType: S
           - AttributeName: todoId
             AttributeType: S
         KeySchema:
-           AttributeName: userId 
+          - AttributeName: userId 
             KeyType: HASH # partition key
           - AttributeName: todoId 
             KeyType: RANGE # sort key
