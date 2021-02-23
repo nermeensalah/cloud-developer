@@ -7,11 +7,11 @@ import * as AWSXRay from 'aws-xray-sdk';
 import { createLogger } from '../../utils/logger'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { getUserId } from '../utils'
+ import { getUserId } from '../utils'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
-const todosTable = process.env.TODOS_TABLE
-const logger = createLogger('uploadTodoUrl');
+ const docClient = new AWS.DynamoDB.DocumentClient()
+ const todosTable = process.env.TODOS_TABLE
+ const logger = createLogger('uploadTodoUrl');
 
 
 const XAWS = AWSXRay.captureAWS(AWS);
@@ -26,33 +26,35 @@ function getUploadedUrl(todoId: string): string {
   return s3.getSignedUrl('putObject', {
       Bucket: bucketName,
       Key: todoId,
-      Expires: urlExpiration,
+      Expires: +urlExpiration,
   });
 }
 export const handler= middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const todoId = event.pathParameters.todoId
   console.log(todoId);
   const userId = getUserId(event);
- 
   const uploadUrl = getUploadedUrl(todoId);
+
   const updatedTodo = {
-    url: `https://${bucketName}.s3.amazonaws.com/${todoId}`
+    attachmentUrl: `https://${bucketName}.s3.amazonaws.com/${todoId}`
   }
 
 
-await docClient.update({
+ await docClient.update({
   TableName: todosTable,
   Key: { 
-      todoId: todoId, 
-      userId: userId },
-  ExpressionAttributeNames: {"#A": "attachmentUrl"},
-  UpdateExpression: "set #A = :attachmentUrl",
-  ExpressionAttributeValues: {
-      ":attachmentUrl": updatedTodo.url,
-  },
-  ReturnValues: "UPDATED_URL"
+    userId: userId , 
+    todoId: todoId
+     },
+     UpdateExpression: 
+     'set #attachmentUrl = :attachmentUrl',
+     ExpressionAttributeValues: {
+      ':attachmentUrl': updatedTodo.attachmentUrl
+  },  ExpressionAttributeNames: {
+    '#attachmentUrl': 'attachmentUrl'
+} 
 }).promise();
-logger.info("The url is" +uploadUrl);
+ logger.info("The url is" +uploadUrl);
 return {
   statusCode: 200,
   headers: {
