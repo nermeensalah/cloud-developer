@@ -11,14 +11,15 @@ const todosTable = process.env.TODOS_TABLE;
 const logger = createLogger('delete Todo');
 export const handler= middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const todoId = event.pathParameters.todoId
-  const user = getUserId(event);
+   //const userId= 'google-oauth2|103198425751808458594';
+  const userId = getUserId(event);
   console.log(todoId);
   // TODO: Remove a TODO item by id
   const params = {
     TableName: todosTable,
     Key: {
       todoId, 
-      user
+      userId
     }
   }
   await client.delete(params).promise()

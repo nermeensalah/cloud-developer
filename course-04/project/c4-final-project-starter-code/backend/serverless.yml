@@ -70,6 +70,7 @@ functions:
           method: get
           path: todos
           cors: true
+          authorizer: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
