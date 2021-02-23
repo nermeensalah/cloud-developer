@@ -24,6 +24,8 @@ export const handler = middy( async (event: APIGatewayProxyEvent): Promise<APIGa
   const newItem = {
     todoId: itemId,
     userId: user,
+    createdAt: new Date().toISOString(),
+    done: false,
     ...parsedBody //name, duedate
   }
 
