@@ -1,17 +1,19 @@
 import 'source-map-support/register'
 
-import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { createLogger } from '../../utils/logger'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import * as AWS  from 'aws-sdk'
 import * as uuid from 'uuid'
 import { getUserId } from '../utils'
+import { cors } from 'middy/middlewares';
+import * as middy from 'middy'
 
 const docClient = new AWS.DynamoDB.DocumentClient()
 const TodosTable = process.env.TODOS_TABLE
 const logger = createLogger('add Todo');
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const handler = middy( async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
  
   console.log('Processing event: ', event)
   const itemId = uuid.v4();
@@ -42,4 +44,12 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       }
     })
   }
-}
+})
+
+
+
+handler.use(
+  cors({
+    credentials: true
+  })
+)

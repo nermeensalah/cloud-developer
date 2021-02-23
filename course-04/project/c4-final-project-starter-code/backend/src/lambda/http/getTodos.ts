@@ -10,7 +10,7 @@ import { TodoItem } from '../../models/TodoItem'
 
 const client = new AWS.DynamoDB.DocumentClient();
 const todosTable = process.env.TODOS_TABLE;
-// const indexTable=process.env.INDEX_NAME;
+ const indexTable=process.env.INDEX_NAME;
 const logger = createLogger('Get Todo');
 
 
@@ -23,6 +23,7 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   
   const result = await client.query({ 
     TableName: todosTable, // name of base table
+    IndexName : indexTable,
     KeyConditionExpression: 'userId = :userId', 
     ExpressionAttributeValues: { ':userId': userId },
   }).promise();
